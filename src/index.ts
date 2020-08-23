@@ -6,6 +6,8 @@ import {Team, getTeamFor} from "./KeyAssociater";
 const app = express();
 let game : Game | null;
 
+app.use(express.static("src/static"));
+
 /**
  * Resets the game as long as the admin key is supplied
  */
@@ -16,14 +18,6 @@ app.post("/api/reset", (req, res) => {
 	}
 	game = null;
 	res.send(true);
-});
-
-/**
- * TODO:
- * Returns a 'home' or 'landing' page
- */
-app.get("/", (req, res) => {
-	res.send("Sorry, we will send some sort of nice landing/updates page here.");
 });
 
 /**
@@ -41,13 +35,14 @@ app.get("/api/phase", (req, res) => {
 /**
  * Allows the user to send over a spiderweb if they are the spider
  * Sends back whether their web was accepted or not
+ * TODO: do this
  */
 app.post("/api/spiderweb", (req, res) => {
-	if (getTeamFor(<string> req.query.key) == Team.ANTS || !validateGraph()) {
+	if (getTeamFor(<string> req.query.key) == Team.ANTS || !validateGraph([])) {
 		res.send(false);
 		return;
 	}
-	game = new Game(new Spiderweb());
+	game = new Game(new Spiderweb([]));
 	res.send(true);
 });
 
