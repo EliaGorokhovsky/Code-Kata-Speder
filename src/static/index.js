@@ -24,6 +24,7 @@ sendGraph = async () => {
 }
 
 async function main() {
+	renderer.clearRect(0, 0, canvas.width, canvas.height);
 	let graph = JSON.parse(await (await fetch(`${window.location.href.split("?")[0]}api/view/web?key=hello_there`, {method: "GET"})).text());
 	graph.nodes.forEach(node => {
 		renderer.beginPath();
@@ -40,7 +41,7 @@ async function main() {
 	}
 }
 
-sendGraph().then(main);
+sendGraph().then(() => {setInterval(main, 200)});
 
 
 function draw() {

@@ -1,4 +1,5 @@
 import * as util from "./util";
+import {getDistance} from "./util";
 
 /**
  * Represent a spider web
@@ -16,10 +17,12 @@ export class Spiderweb {
 	 * @param adjacencies the adjacency map, listing the adjacent indices for each node
 	 */
 	constructor(public adjacencies: Array<Array<number>>) {
-		this.nodes = util.range(adjacencies.length).map(key => new SpiderwebNode(key, key / adjacencies.length + 1 / (2 * adjacencies.length), key / adjacencies.length + 1 / (2 * adjacencies.length)));
+		this.nodes = util.range(adjacencies.length).map(key => new SpiderwebNode(key, Math.random(), Math.random()));
+		this.update()
 	}
 
 	update() {
+		util.range(1).forEach(() => {stepForce(this, 1, 0.3, 0.6, 0.2, 0.01);});
 	}
 }
 
@@ -60,4 +63,72 @@ export function validateGraph(adjacencies: Array<Array<number>>): boolean {
 	}
 	// TODO: ensure connectivity
 	return true;
+}
+
+function stepForce(web: Spiderweb, springConstant: number, restingLength: number, invisibleRestingLength: number,
+				   invisibleSpringConstant: number, dt: number, vdecay = 0.8) {
+	// Update positions
+	web.nodes.forEach(node => {
+		node.x = Math.min(Math.max(0, node.x + dt * node.vx), 1);
+		node.y = Math.min(Math.max(0, node.y + dt * node.vx), 1);
+		node.vx *= vdecay;
+		node.vy *= vdecay;
+	})
+	// Force
+	web.nodes.forEach(node1 => {
+		web.nodes.forEach(node2 => {
+			if (node1.x != node2.x || node1.y != node2.y) {
+				let k;
+				let l;
+				if (web.adjacencies[node1.index].includes(node2.index)) {
+					k = springConstant;
+					l = restingLength;
+				} else {
+					k = invisibleSpringConstant;
+					l = invisibleRestingLength;
+				}
+				let r = getDistance(node1.x, node1.y, node2.x, node2.y);
+				let f = k * (r - l);
+				// console.log(`Node: ${node1.x}, ${node1.y}, 2 ${node2.x}, ${node2.y}, force ${f}`);
+				let dx = node2.x - node1.x;
+				let dy = node2.y - node1.y;
+				node1.vx += f * dx / r;
+				node1.vy += f * dy / r;
+			}
+		});
+	});
+
+	// // Gravitational force
+	// web.nodes.forEach(node1 => {
+	// 	web.nodes.forEach(node2 => {
+	// 		if (node1.x != node2.x || node1.y != node2.y) {
+	// 			let r = getDistance(node1.x, node1.y, node2.x, node2.y);
+	// 			let f = gravitationalConstant / r / r;
+	// 			// console.log(`Node: ${node1.x}, ${node1.y}, 2 ${node2.x}, ${node2.y}, force ${f}`);
+	// 			let dx = node2.x - node1.x;
+	// 			let dy = node2.y - node1.y;
+	// 			node1.vx += f * dx / r;
+	// 			node1.vy += f * dy / r;
+	// 		} else {
+	// 			node1.vx -= Math.random() * 0.001;
+	// 			node1.vy -= Math.random() * 0.001;
+	// 		}
+	// 	});
+	// });
+	// Spring force
+	// for (let i = 0; i < web.adjacencies.length; i++) {
+	// 	web.adjacencies[i].forEach(j => {
+	// 		let node1 = web.nodes[i];
+	// 		let node2 = web.nodes[j];
+	// 		if (node1.x != node2.x || node1.y != node2.y) {
+	// 			let r = getDistance(node1.x, node1.y, node2.x, node2.y);
+	// 			let f = springConstant * (r - restingLength);
+	// 			// console.log(`Node: ${node1.x}, ${node1.y}, 2 ${node2.x}, ${node2.y}, force ${f}`);
+	// 			let dx = node2.x - node1.x;
+	// 			let dy = node2.y - node1.y;
+	// 			node1.vx += f * dx / r;
+	// 			node1.vy += f * dy / r;
+	// 		}
+	// 	});
+	// }
 }

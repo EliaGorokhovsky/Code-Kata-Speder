@@ -42,11 +42,23 @@ app.get("/api/phase", (req, res) => {
  * TODO: do this
  */
 app.post("/api/spiderweb", (req, res) => {
-	if (getTeamFor(<string> req.query.key) == Team.ANTS || !validateGraph([[1], [0]])) {
+	let adjacencies = [
+		[1, 2, 3, 4, 5],
+		[0, 2, 3],
+		[0, 1, 3],
+		[0, 1, 2, 6],
+		[0],
+		[0],
+		[3, 7, 8, 9],
+		[6, 8],
+		[6, 7, 9],
+		[6, 8]
+	]
+	if (getTeamFor(<string> req.query.key) == Team.ANTS || !validateGraph(adjacencies)) {
 		res.send(false);
 		return;
 	}
-	game = new Game(new Spiderweb([[1], [0]]));
+	game = new Game(new Spiderweb(adjacencies));
 	res.send(true);
 });
 
@@ -58,7 +70,8 @@ app.get("/api/view/web", (req, res) => {
 		res.send(false);
 		return;
 	}
-	res.json(game?.spiderweb)
+	game?.spiderweb.update();
+	res.json(game?.spiderweb);
 });
 
 const port = process.env.PORT || 3000;
