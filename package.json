@@ -1,0 +1,37 @@
+{
+	"name": "code-kata-speder",
+	"version": "1.0.0",
+	"description": "A Code Kata about spiders eating ants!",
+	"main": "src/index.ts",
+	"scripts": {
+		"transpile": "tsc",
+		"start": "npm run transpile; node build/index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/KadinTucker/Code-Kata-Speder.git"
+	},
+	"contributors": [
+		{
+			"name": "Saurabh Totey",
+			"email": "SaurabhTotey@gmail.com",
+			"url": "https://www.SaurabhTotey.com"
+		},
+		{
+			"name": "Kadin Tucker"
+		},
+		{
+			"name": "Elia Gorokhovsky"
+		}
+	],
+	"bugs": {
+		"url": "https://github.com/KadinTucker/Code-Kata-Speder/issues"
+	},
+	"homepage": "https://github.com/KadinTucker/Code-Kata-Speder#readme",
+	"dependencies": {
+		"@types/express": "^4.17.7",
+		"dotenv": "^8.2.0",
+		"express": "^4.17.1",
+		"typescript": "^3.9.7"
+	}
+}
