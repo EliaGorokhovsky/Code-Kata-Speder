@@ -1,9 +1,12 @@
 import {Spiderweb} from "./Spiderweb";
 import {GamePhase} from "./GamePhase";
 
+/**
+ * The primary class storing all components of the game
+ */
 export class Game {
 
-	private _gamePhase = GamePhase.AWAITING_CORRECT_GRAPH_FROM_SPIDER;
+	private _gamePhase = GamePhase.AWAITING_CORRECT_GRAPH_FROM_SPIDER; ///The current game phase; see GamePhase; initially waiting for spider's graph
 	get gamePhase(): GamePhase { return this._gamePhase }
 
 	constructor(readonly spiderweb: Spiderweb) {

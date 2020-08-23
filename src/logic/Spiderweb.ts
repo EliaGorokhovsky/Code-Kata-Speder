@@ -9,7 +9,7 @@ import {getDistance} from "./util";
  */
 export class Spiderweb {
 
-	nodes: Array<SpiderwebNode>; ///The list of nodes in the web, to be referenced by index
+	nodes: Array<SpiderwebNode>; /// The list of nodes in the web, to be referenced by index
 	sim: any;
 
 	/**
@@ -22,7 +22,7 @@ export class Spiderweb {
 	}
 
 	update() {
-		util.range(1).forEach(() => {stepForce(this, 1, 0.3, 0.6, 0.2, 0.01);});
+		util.range(1).forEach(() => {stepForce(this, 1, 0.3, 0.5, 0.2, 0.01, 0.1);});
 	}
 }
 
@@ -65,16 +65,29 @@ export function validateGraph(adjacencies: Array<Array<number>>): boolean {
 	return true;
 }
 
+/**
+ * A single step in the graph drawing algorithm
+ * Applies force to each node and moves them
+ * Force is applied via a spring and Hooke's law,
+ * and also by "gravity", which is inverse square repulsion between nodes
+ * @param web The web graph to draw
+ * @param springConstant The spring constant applied for Hooke's law on graph connections
+ * @param restingLength The distance past which the spring pulls back, otherwise pushes out
+ * @param invisibleRestingLength Used for resting length when the two nodes are not connected
+ * @param invisibleSpringConstant Used as the spring constant when the two nodes are not connected
+ * @param dt The amount of time passed in this single function call
+ * @param vdecay The factor by which velocity decays for each node
+ */
 function stepForce(web: Spiderweb, springConstant: number, restingLength: number, invisibleRestingLength: number,
-				   invisibleSpringConstant: number, dt: number, vdecay = 0.8) {
-	// Update positions
+				   invisibleSpringConstant: number, gravityConstant: number, dt: number, vdecay = 0.95) {
+	// Update positions according to node velocity
 	web.nodes.forEach(node => {
 		node.x = Math.min(Math.max(0, node.x + dt * node.vx), 1);
-		node.y = Math.min(Math.max(0, node.y + dt * node.vx), 1);
+		node.y = Math.min(Math.max(0, node.y + dt * node.vy), 1);
 		node.vx *= vdecay;
 		node.vy *= vdecay;
 	})
-	// Force
+	// Application of force to each node
 	web.nodes.forEach(node1 => {
 		web.nodes.forEach(node2 => {
 			if (node1.x != node2.x || node1.y != node2.y) {
@@ -88,47 +101,17 @@ function stepForce(web: Spiderweb, springConstant: number, restingLength: number
 					l = invisibleRestingLength;
 				}
 				let r = getDistance(node1.x, node1.y, node2.x, node2.y);
-				let f = k * (r - l);
+				// Get the force value: = spring force - "gravity" force
+				// because they apply in opposite directions
+				let f = k * (r - l) - gravityConstant / r / r;
 				// console.log(`Node: ${node1.x}, ${node1.y}, 2 ${node2.x}, ${node2.y}, force ${f}`);
+				// Apply the force, f, by components
 				let dx = node2.x - node1.x;
 				let dy = node2.y - node1.y;
-				node1.vx += f * dx / r;
-				node1.vy += f * dy / r;
+				node1.vx += dt * f * dx / r;
+				node1.vy += dt * f * dy / r;
 			}
 		});
 	});
 
-	// // Gravitational force
-	// web.nodes.forEach(node1 => {
-	// 	web.nodes.forEach(node2 => {
-	// 		if (node1.x != node2.x || node1.y != node2.y) {
-	// 			let r = getDistance(node1.x, node1.y, node2.x, node2.y);
-	// 			let f = gravitationalConstant / r / r;
-	// 			// console.log(`Node: ${node1.x}, ${node1.y}, 2 ${node2.x}, ${node2.y}, force ${f}`);
-	// 			let dx = node2.x - node1.x;
-	// 			let dy = node2.y - node1.y;
-	// 			node1.vx += f * dx / r;
-	// 			node1.vy += f * dy / r;
-	// 		} else {
-	// 			node1.vx -= Math.random() * 0.001;
-	// 			node1.vy -= Math.random() * 0.001;
-	// 		}
-	// 	});
-	// });
-	// Spring force
-	// for (let i = 0; i < web.adjacencies.length; i++) {
-	// 	web.adjacencies[i].forEach(j => {
-	// 		let node1 = web.nodes[i];
-	// 		let node2 = web.nodes[j];
-	// 		if (node1.x != node2.x || node1.y != node2.y) {
-	// 			let r = getDistance(node1.x, node1.y, node2.x, node2.y);
-	// 			let f = springConstant * (r - restingLength);
-	// 			// console.log(`Node: ${node1.x}, ${node1.y}, 2 ${node2.x}, ${node2.y}, force ${f}`);
-	// 			let dx = node2.x - node1.x;
-	// 			let dy = node2.y - node1.y;
-	// 			node1.vx += f * dx / r;
-	// 			node1.vy += f * dy / r;
-	// 		}
-	// 	});
-	// }
 }
