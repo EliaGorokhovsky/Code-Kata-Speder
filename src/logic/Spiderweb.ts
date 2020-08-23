@@ -16,7 +16,7 @@ export class Spiderweb {
 	 * @param adjacencies the adjacency map, listing the adjacent indices for each node
 	 */
 	constructor(public adjacencies: Array<Array<number>>) {
-		this.nodes = util.range(adjacencies.length).map(key => new SpiderwebNode(key, key, key));
+		this.nodes = util.range(adjacencies.length).map(key => new SpiderwebNode(key, key / adjacencies.length + 1 / (2 * adjacencies.length), key / adjacencies.length + 1 / (2 * adjacencies.length)));
 	}
 
 	update() {
@@ -54,9 +54,9 @@ export function validateGraph(adjacencies: Array<Array<number>>): boolean {
 		// Ensure non-isolation
 		if (adjacencies[i].length == 0) return false;
 		// Ensure symmetry
-		for (let j = 0; j < adjacencies[i].length; j++) {
+		adjacencies[i].forEach(j => {
 			if (!adjacencies[j].includes(i)) return false;
-		}
+		});
 	}
 	// TODO: ensure connectivity
 	return true;

@@ -42,11 +42,11 @@ app.get("/api/phase", (req, res) => {
  * TODO: do this
  */
 app.post("/api/spiderweb", (req, res) => {
-	if (getTeamFor(<string> req.query.key) == Team.ANTS || !validateGraph([])) {
+	if (getTeamFor(<string> req.query.key) == Team.ANTS || !validateGraph([[1], [0]])) {
 		res.send(false);
 		return;
 	}
-	game = new Game(new Spiderweb([]));
+	game = new Game(new Spiderweb([[1], [0]]));
 	res.send(true);
 });
 
@@ -54,12 +54,11 @@ app.post("/api/spiderweb", (req, res) => {
  * Handles requests to view the spiderweb
  */
 app.get("/api/view/web", (req, res) => {
-	console.log("hello there")
 	if (getTeamFor(<string> req.query.key) != Team.ADMIN) {
 		res.send(false);
 		return;
 	}
-	res.send(game?.spiderweb)
+	res.json(game?.spiderweb)
 });
 
 const port = process.env.PORT || 3000;
