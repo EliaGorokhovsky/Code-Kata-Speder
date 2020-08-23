@@ -1,5 +1,7 @@
+import {Spiderweb} from "./Spiderweb";
+import {GamePhase} from "./GamePhase";
 
-class Game {
+export class Game {
 
 	private _gamePhase = GamePhase.AWAITING_CORRECT_GRAPH_FROM_SPIDER;
 	get gamePhase(): GamePhase { return this._gamePhase }

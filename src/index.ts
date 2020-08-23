@@ -2,6 +2,10 @@ import "dotenv/config";
 import * as process from "process";
 import express = require("express");
 import {Team, getTeamFor} from "./KeyAssociater";
+import {Spiderweb, validateGraph} from "./logic/Spiderweb";
+import {Game} from "./logic/Game";
+import {GamePhase} from "./logic/GamePhase";
+
 
 const app = express();
 let game : Game | null;
@@ -44,6 +48,18 @@ app.post("/api/spiderweb", (req, res) => {
 	}
 	game = new Game(new Spiderweb([]));
 	res.send(true);
+});
+
+/**
+ * Handles requests to view the spiderweb
+ */
+app.get("/api/view/web", (req, res) => {
+	console.log("hello there")
+	if (getTeamFor(<string> req.query.key) != Team.ADMIN) {
+		res.send(false);
+		return;
+	}
+	res.send(game?.spiderweb)
 });
 
 const port = process.env.PORT || 3000;

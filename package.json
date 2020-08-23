@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/EliaGorokhovsky/Code-Kata-Speder#readme",
   "dependencies": {
+    "@types/d3": "^5.7.2",
     "@types/express": "^4.17.7",
     "d3-force": "^2.1.0",
     "dotenv": "^8.2.0",
