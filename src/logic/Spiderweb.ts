@@ -1,5 +1,5 @@
 import * as util from "./util";
-import {getDistance} from "./util";
+import {addAll, areSetsEqual, getDistance} from "./util";
 
 /**
  * Represent a spider web
@@ -55,13 +55,22 @@ class SpiderwebNode {
 export function validateGraph(adjacencies: Array<Array<number>>): boolean {
 	for (let i = 0; i < adjacencies.length; i++) {
 		// Ensure non-isolation
-		if (adjacencies[i].length == 0) return false;
+		if (adjacencies[i].length < 2) return false;
 		// Ensure symmetry
 		adjacencies[i].forEach(j => {
 			if (!adjacencies[j].includes(i)) return false;
 		});
 	}
-	// TODO: ensure connectivity
+
+	// Check that all nodes are reachable from 0
+	// This ensures that the graph is connected
+	let reachable: Set<number> = new Set();
+	let nextReachable: Set<number> = new Set([0]);
+	while (!areSetsEqual(reachable, nextReachable)) {
+		reachable = addAll(reachable, nextReachable);
+		reachable.forEach(element => {nextReachable = addAll(nextReachable, new Set(adjacencies[element]))});
+	}
+	if (!areSetsEqual(reachable, new Set(util.range(adjacencies.length)))) return false;
 	return true;
 }
 
